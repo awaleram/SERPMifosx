@@ -52,7 +52,7 @@ public class GenericDataServiceImpl implements GenericDataService {
 
         for (int i = 0; i < rsmd.getColumnCount(); i++) {
 
-            final String columnName = rsmd.getColumnName(i + 1);
+            final String columnName = rsmd.getColumnLabel(i + 1);
             final String columnType = rsmd.getColumnTypeName(i + 1);
 
             final ResultsetColumnHeaderData columnHeader = ResultsetColumnHeaderData.basic(columnName, columnType);
@@ -62,7 +62,7 @@ public class GenericDataServiceImpl implements GenericDataService {
         while (rs.next()) {
             final List<String> columnValues = new ArrayList<>();
             for (int i = 0; i < rsmd.getColumnCount(); i++) {
-                final String columnName = rsmd.getColumnName(i + 1);
+                final String columnName = rsmd.getColumnLabel(i + 1);
                 final String columnValue = rs.getString(columnName);
                 columnValues.add(columnValue);
             }
@@ -100,6 +100,9 @@ public class GenericDataServiceImpl implements GenericDataService {
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7046875 - prevent
         // Invalid Column Name bug in sun's CachedRowSetImpl where it doesn't
         // pick up on label names, only column names
+    	// In case we are calling a Procedure do not Wrap
+    	if(sql.toUpperCase().trim().startsWith("CALL"))
+    		return sql;
         return "select x.* from (" + sql + ") x";
     }
 
